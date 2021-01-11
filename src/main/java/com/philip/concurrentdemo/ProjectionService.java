@@ -46,18 +46,14 @@ public class ProjectionService {
                     }
 
                     CompletableFuture<Void> projection1 = operationA
-                            .whenComplete((result, ex) -> {
-                                if(null != ex){
-                                    ex.printStackTrace();
-                                }
-                            })
                             .thenAccept(pickList::setADetails)
                             .thenApplyAsync((f) -> getProjectionOne(pickList), projectionExecutor)
-                            .exceptionally((ex) -> {
-                                    ex.printStackTrace();
-                                    return "Exception while getting projection 1";
-                            })
-                            .thenAccept(pickList::setProjection1);
+                            .thenAccept(pickList::setProjection1)
+                            .exceptionally(e -> {
+                                e.printStackTrace();
+                                pickList.getErrors().add(e.getMessage());
+                                return null;
+                            });
 
                     projectionFutures.add(projection1);
 
@@ -68,17 +64,13 @@ public class ProjectionService {
                     }
 
                     CompletableFuture<Void> projection2 = operationA
-                            .whenComplete((result, ex) -> {
-                                if(null != ex){
-                                    ex.printStackTrace();
-                                }
-                            })
                             .thenApplyAsync((f) -> getProjectionTwo(pickList), projectionExecutor)
-                            .exceptionally((ex) -> {
-                                ex.printStackTrace();
-                                return "Exception while getting projection 2";
-                            })
-                            .thenAccept(pickList::setProjection2);
+                            .thenAccept(pickList::setProjection2)
+                            .exceptionally(e -> {
+                                e.printStackTrace();
+                                pickList.getErrors().add(e.getMessage());
+                                return null;
+                            });
 
                     projectionFutures.add(projection2);
                     break;
@@ -90,20 +82,14 @@ public class ProjectionService {
                     operationB.thenAccept(pickList::setBDetails);
 
                     CompletableFuture<Void> projection3 = operationB
-                            .handle((result, ex) -> {
-                                if(null != ex){
-                                    ex.printStackTrace();
-                                    return "Exception while fetching B details.";
-                                }
-                                return result;
-                            })
                             .thenAccept(pickList::setBDetails)
                             .thenApplyAsync((f) -> getProjectionThree(pickList), projectionExecutor)
-                            .exceptionally((ex) -> {
-                                ex.printStackTrace();
-                                return "Exception while getting projection 3";
-                            })
-                            .thenAccept(pickList::setProjection3);
+                            .thenAccept(pickList::setProjection3)
+                            .exceptionally(e -> {
+                                e.printStackTrace();
+                                pickList.getErrors().add(e.getMessage());
+                                return null;
+                            });
 
                     projectionFutures.add(projection3);
 
@@ -114,22 +100,16 @@ public class ProjectionService {
                     }
 
                     CompletableFuture<Void> projection4 = operationB
-                            .handle((result, ex) -> {
-                                if(null != ex){
-                                    ex.printStackTrace();
-                                    return "Exception while fetching B details.";
-                                }
-                                return result;
-                            })
                             .thenAccept(pickList::setBDetails)
                             .thenApplyAsync(
                                     (f) -> getProjectionFour(pickList),
                                     projectionExecutor)
-                            .exceptionally((ex) -> {
-                                ex.printStackTrace();
-                                return "Exception while getting projection 4";
-                            })
-                            .thenAccept(pickList::setProjection4);
+                            .thenAccept(pickList::setProjection4)
+                            .exceptionally(e -> {
+                                e.printStackTrace();
+                                pickList.getErrors().add(e.getMessage());
+                                return null;
+                            });
 
                     projectionFutures.add(projection4);
 
@@ -138,11 +118,12 @@ public class ProjectionService {
                     CompletableFuture<Void> projection5 = CompletableFuture.supplyAsync(
                             () -> getProjectionFive(pickList),
                             projectionExecutor)
-                            .exceptionally((ex) -> {
-                                ex.printStackTrace();
-                                return "Exception while getting projection 5";
-                            })
-                            .thenAccept(pickList::setProjection5);
+                            .thenAccept(pickList::setProjection5)
+                            .exceptionally(e -> {
+                                e.printStackTrace();
+                                pickList.getErrors().add(e.getMessage());
+                                return null;
+                            });
 
                     projectionFutures.add(projection5);
                     break;
@@ -150,11 +131,12 @@ public class ProjectionService {
                     CompletableFuture<Void> projection6 = CompletableFuture.supplyAsync(
                             () -> getProjectionSix(pickList),
                             projectionExecutor)
-                            .exceptionally((ex) -> {
-                                ex.printStackTrace();
-                                return "Exception while getting projection 6";
-                            })
-                            .thenAccept(pickList::setProjection6);
+                            .thenAccept(pickList::setProjection6)
+                            .exceptionally(e -> {
+                                e.printStackTrace();
+                                pickList.getErrors().add(e.getMessage());
+                                return null;
+                            });
 
                     projectionFutures.add(projection6);
                     break;
@@ -185,11 +167,10 @@ public class ProjectionService {
             e.printStackTrace();
         }
 
-        if(System.currentTimeMillis() % 2 == 0){
-            System.out.println("Throwing exception in getProjectionOne::Thread: " + Thread.currentThread().getName());
-            throw new HttpClientErrorException(HttpStatus.REQUEST_TIMEOUT, "Request timed out!");
-        }
-
+//        if(System.currentTimeMillis() % 2 == 0){
+//            System.out.println("Throwing exception in getProjectionOne::Thread: " + Thread.currentThread().getName());
+//            throw new HttpClientErrorException(HttpStatus.REQUEST_TIMEOUT, "Request timed out!");
+//        }
 
         return "Projection-1-Result";
     }
@@ -203,10 +184,10 @@ public class ProjectionService {
             e.printStackTrace();
         }
 
-        if(System.currentTimeMillis() % 9 == 0){
-            System.out.println("Throwing exception in getProjectionTwo::Thread: " + Thread.currentThread().getName());
-            throw new HttpClientErrorException(HttpStatus.REQUEST_TIMEOUT, "Request timed out!");
-        }
+//        if(System.currentTimeMillis() % 9 == 0){
+//            System.out.println("Throwing exception in getProjectionTwo::Thread: " + Thread.currentThread().getName());
+//            throw new HttpClientErrorException(HttpStatus.REQUEST_TIMEOUT, "Request timed out!");
+//        }
 
 
         return "Projection-2-Result";
@@ -221,10 +202,10 @@ public class ProjectionService {
             e.printStackTrace();
         }
 
-        if(System.currentTimeMillis() % 3 == 0){
-            System.out.println("Throwing exception in getProjectionThree::Thread: " + Thread.currentThread().getName());
-            throw new HttpClientErrorException(HttpStatus.REQUEST_TIMEOUT, "Exception while making request.");
-        }
+//        if(System.currentTimeMillis() % 3 == 0){
+//            System.out.println("Throwing exception in getProjectionThree::Thread: " + Thread.currentThread().getName());
+//            throw new HttpClientErrorException(HttpStatus.REQUEST_TIMEOUT, "Exception while making request.");
+//        }
 
         return "Projection-3-Result";
     }
@@ -238,10 +219,10 @@ public class ProjectionService {
             e.printStackTrace();
         }
 
-        if(System.currentTimeMillis() % 8 == 0){
-            System.out.println("Throwing exception in getProjectionFour::Thread: " + Thread.currentThread().getName());
-            throw new HttpClientErrorException(HttpStatus.REQUEST_TIMEOUT, "Request timed out!");
-        }
+//        if(System.currentTimeMillis() % 8 == 0){
+//            System.out.println("Throwing exception in getProjectionFour::Thread: " + Thread.currentThread().getName());
+//            throw new HttpClientErrorException(HttpStatus.REQUEST_TIMEOUT, "Request timed out!");
+//        }
 
 
         return "Projection-4-Result";
@@ -256,10 +237,10 @@ public class ProjectionService {
             e.printStackTrace();
         }
 
-        if(System.currentTimeMillis() % 7 == 0){
-            System.out.println("Throwing exception in getProjectionFive::Thread: " + Thread.currentThread().getName());
-            throw new HttpClientErrorException(HttpStatus.REQUEST_TIMEOUT, "Request timed out!");
-        }
+//        if(System.currentTimeMillis() % 7 == 0){
+//            System.out.println("Throwing exception in getProjectionFive::Thread: " + Thread.currentThread().getName());
+//            throw new HttpClientErrorException(HttpStatus.REQUEST_TIMEOUT, "Request timed out!");
+//        }
 
 
         return "Projection-5-Result";
@@ -274,10 +255,10 @@ public class ProjectionService {
             e.printStackTrace();
         }
 
-        if(System.currentTimeMillis() % 6 == 0){
-            System.out.println("Throwing exception in getProjectionSix::Thread: " + Thread.currentThread().getName());
-            throw new HttpClientErrorException(HttpStatus.REQUEST_TIMEOUT, "Request timed out!");
-        }
+//        if(System.currentTimeMillis() % 6 == 0){
+//            System.out.println("Throwing exception in getProjectionSix::Thread: " + Thread.currentThread().getName());
+//            throw new HttpClientErrorException(HttpStatus.REQUEST_TIMEOUT, "Request timed out!");
+//        }
 
 
         return "Projection-6-Result";
@@ -294,7 +275,6 @@ public class ProjectionService {
 
         if(System.currentTimeMillis() % 4 == 0){
             System.out.println("Throwing exception in gatherADetails::Thread: " + Thread.currentThread().getName());
-
             throw new HttpClientErrorException(HttpStatus.REQUEST_TIMEOUT, "Request timed out!");
         }
 
